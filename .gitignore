@@ -1,0 +1,29 @@
+# Python cache/build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local database/runtime files
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment/local config
+.env
+.env.*
+
+# OS/editor files
+.DS_Store
+.idea/
+.vscode/
