@@ -90,6 +90,110 @@ class CliFlowTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Ошибка: Неверные учетные данные", result.stdout)
 
+    def test_chat_add_requires_username_not_user_id(self):
+        result = self.run_cli(
+            "\n".join(
+                [
+                    "2",
+                    "owner",
+                    "owner@example.com",
+                    "Pass1!",
+                    "/chat new room",
+                    "/register",
+                    "member",
+                    "member@example.com",
+                    "Pass1!",
+                    "/login",
+                    "owner",
+                    "Pass1!",
+                    "/chat open room",
+                    "/chat add 2 member",
+                    "/chat members",
+                    "/chat add member member",
+                    "/chat members",
+                    "/quit",
+                    "",
+                ]
+            )
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("Ошибка: Операция не выполнена", result.stdout)
+        self.assertIn("1. owner [owner]", result.stdout)
+        self.assertIn("Пользователь добавлен", result.stdout)
+        self.assertIn("2. member [member]", result.stdout)
+
+    def test_invalid_cli_roles_and_message_numbers(self):
+        result = self.run_cli(
+            "\n".join(
+                [
+                    "2",
+                    "owner",
+                    "owner@example.com",
+                    "Pass1!",
+                    "/chat new room",
+                    "/register",
+                    "member",
+                    "member@example.com",
+                    "Pass1!",
+                    "/login",
+                    "owner",
+                    "Pass1!",
+                    "/chat open room",
+                    "/chat add member member",
+                    "/chat role member owner",
+                    "/chat role member badrole",
+                    "/send first",
+                    "/send second",
+                    "/messages",
+                    "/message delete abc",
+                    "/message delete 999",
+                    "/message delete 2",
+                    "/messages",
+                    "/quit",
+                    "",
+                ]
+            )
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertGreaterEqual(result.stdout.count("Ошибка: Операция не выполнена"), 2)
+        self.assertIn("1. [", result.stdout)
+        self.assertIn("owner: first", result.stdout)
+        self.assertIn("2. [", result.stdout)
+        self.assertIn("owner: second", result.stdout)
+        self.assertIn("Укажите корректный номер сообщения", result.stdout)
+        self.assertIn("Сначала выполните /messages и выберите номер из вывода", result.stdout)
+        self.assertIn("Сообщение удалено", result.stdout)
+
+        last_messages_output = result.stdout.rsplit("Сообщение удалено", maxsplit=1)[-1]
+        self.assertIn("owner: first", last_messages_output)
+        self.assertNotIn("owner: second", last_messages_output)
+
+    def test_non_member_cannot_open_chat_by_id_in_cli(self):
+        result = self.run_cli(
+            "\n".join(
+                [
+                    "2",
+                    "owner",
+                    "owner@example.com",
+                    "Pass1!",
+                    "/chat new private",
+                    "/register",
+                    "stranger",
+                    "stranger@example.com",
+                    "Pass1!",
+                    "/chat open 1",
+                    "/quit",
+                    "",
+                ]
+            )
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("Ошибка: Операция не выполнена", result.stdout)
+        self.assertNotIn("Открыт чат 1", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
