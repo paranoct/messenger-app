@@ -8,13 +8,13 @@ class InMemoryChatRepository:
 
     def add_chat(self, chat: Chat):
         if self.get_chat_by_id(chat.id) or self.get_chat_by_name(chat.name):
-            raise ValueError("Chat with this id or name already exists")
+            raise ValueError("Чат с таким id или названием уже существует")
         self.chats[chat.id] = chat
         self.chats_by_name[chat.name] = chat
     
     def delete_chat(self, chat: Chat):
         if not self.get_chat_by_id(chat.id) or not self.get_chat_by_name(chat.name):
-            raise ValueError("Chat with this id or name was not found")
+            raise ValueError("Чат с таким id или названием не найден")
         del self.chats[chat.id]
         del self.chats_by_name[chat.name]
     
@@ -40,13 +40,13 @@ class InMemoryUsersRepository:
 
     def add_user(self, user: User):
         if self.get_user_by_id(user.id) or self.get_user_by_name(user.username):
-            raise ValueError("User with this id or name already exists")
+            raise ValueError("Пользователь с таким id или логином уже существует")
         self.users[user.id] = user
         self.users_by_names[user.username] = user
 
     def delete_user(self, user:User):
         if not self.get_user_by_id(user.id) or not self.get_user_by_name(user.username):
-            raise ValueError("User with this id or name was not found")
+            raise ValueError("Пользователь с таким id или логином не найден")
         del self.users[user.id]
         del self.users_by_names[user.username]
 
@@ -72,5 +72,5 @@ class InMemoryMessagesRepository:
 
     def delete_message(self, message: Message):
         if not self.get_msg_by_id(message.id):
-            raise ValueError("Message with given id was not found")
+            raise ValueError("Сообщение с таким id не найдено")
         del self.messages[message.id]
